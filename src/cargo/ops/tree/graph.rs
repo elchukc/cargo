@@ -398,6 +398,18 @@ fn add_pkg(
             {
                 // Dependency has a `{ …, target = <triple> }`
                 Some(target) => FeaturesFor::ArtifactDep(target),
+                // Get the information of the dependent crate from `features_for`.
+                // If a dependent crate is
+                //
+                // * specified as an artifact dep with a `target`, or
+                // * a host dep,
+                //
+                // its transitive deps, including build-deps, need to be built on that target.
+                None if features_for != FeaturesFor::default() => features_for,
+                // Dependent crate is a normal dep, then back to old rules:
+                //
+                // * normal deps, dev-deps -> inherited target
+                // * build-deps -> host
                 None => {
                     if dep.is_build() || dep_pkg.proc_macro() {
                         FeaturesFor::HostDep
