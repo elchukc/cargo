@@ -1521,7 +1521,7 @@ fn dependencies_of_dependencies_work_in_artifacts() {
         .with_stdout_data(str![[r#"
 foo v0.0.0 ([ROOT]/foo)
 [build-dependencies]
-└── bar v0.5.0 ([ROOT]/foo/bar)
+└── bar v0.5.0 (bin) ([ROOT]/foo/bar)
     └── baz v1.0.0
 
 "#]])
@@ -1572,12 +1572,15 @@ fn artifact_dep_target_specified() {
         .masquerade_as_nightly_cargo(&["bindeps"])
         .with_stdout_data(str![[r#"
 foo v0.0.0 ([ROOT]/foo)
-└── bindep v0.0.0 ([ROOT]/foo/bindep)
+└── bindep v0.0.0 (bin) ([ROOT]/foo/bindep)
 
 "#]])
         .with_status(0)
         .run();
 }
+
+// TODO
+// fn tree_suffix_bin_cdlib_staticlib() {}
 
 /// From issue #10061
 /// The case where:
