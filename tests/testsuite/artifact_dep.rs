@@ -1581,9 +1581,14 @@ foo v0.0.0 ([ROOT]/foo)
 
 /// From issue #10593
 /// The case where:
-/// *   artifact dep is { target = <specified> }
-/// *   dependency of that artifact dependency specifies the same target
+/// *   artifact dep (foo) is { target = <specified> }
+/// *   dependency (bar) of that artifact dependency specifies the same target
 /// *   the target is not activated.
+/// 
+/// * entry point is foo
+/// * a dependency (baz) of an artifact dependency (bar) is platform specified
+/// * artifact dep itself (bar) is { target = <specified> } with the same platform as its own dependency
+/// * the platform is not activated.
 #[cargo_test]
 fn dep_of_artifact_dep_same_target_specified() {
     if cross_compile::disabled() {
@@ -1627,7 +1632,6 @@ fn dep_of_artifact_dep_same_target_specified() {
                 [package]
                 name = "baz"
                 version = "0.1.0"
-
             "#,
         )
         .file("baz/src/lib.rs", "")
@@ -1649,13 +1653,10 @@ fn dep_of_artifact_dep_same_target_specified() {
     // TODO This command currently fails due to a bug in cargo but it should be fixed so that it succeeds in the future.
     p.cargo("tree -Z bindeps")
         .masquerade_as_nightly_cargo(&["bindeps"])
-        .with_stderr_data(
-            r#"...
-no entry found for key
-...
-"#,
-        )
-        .with_status(101)
+        .with_stderr_data("foo v0.0.0 ([ROOT]/foo)
+└── bindep v0.0.0 ([ROOT]/foo/bindep)
+")
+        .with_status(0)
         .run();
 }
 
