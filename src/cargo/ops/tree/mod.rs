@@ -146,7 +146,7 @@ pub fn build_and_print(ws: &Workspace<'_>, opts: &TreeOptions) -> CargoResult<()
     let package_map: HashMap<PackageId, &Package> = ws_resolve
         .pkg_set
         .packages()
-        .map(|pkg| (pkg.package_id(), pkg))
+        .map(|pkg| (pkg.package_id(), pkg)) // TODO here???
         .collect();
 
     let mut graph = graph::build(
