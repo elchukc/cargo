@@ -408,6 +408,7 @@ impl<'gctx> PackageSet<'gctx> {
 
         // let's not flood crates.io with connections
         multi.set_max_host_connections(2)?;
+        println!("LazyCell called on this from PackageSet: {:?}", package_ids);
 
         Ok(PackageSet {
             packages: package_ids
@@ -425,7 +426,9 @@ impl<'gctx> PackageSet<'gctx> {
     pub fn package_ids(&self) -> impl Iterator<Item = PackageId> + '_ {
         self.packages.keys().cloned()
     }
-
+    pub fn packages_debug(&self) -> impl Iterator<Item = Option<&Package>> {
+        self.packages.values().map(|p| p.borrow())
+    }
     pub fn packages(&self) -> impl Iterator<Item = &Package> {
         self.packages.values().filter_map(|p| p.borrow())
     }

@@ -1581,7 +1581,7 @@ foo v0.0.0 ([ROOT]/foo)
 
 /// From issue #10593
 /// The case where:
-/// *   artifact dep (foo) is { target = <specified> }
+/// *   artifact dep (bar) is { target = <specified> }
 /// *   dependency (bar) of that artifact dependency specifies the same target
 /// *   the target is not activated.
 /// 

@@ -356,6 +356,7 @@ fn add_pkg(
                 };
                 // Filter out inactivated targets.
                 if !show_all_targets && !target_data.dep_platform_activated(dep, kind) {
+                    println!("Target is not activated, {:?}", kind);
                     return false;
                 }
                 // Filter out dev-dependencies if requested.
@@ -380,10 +381,13 @@ fn add_pkg(
                 true
             })
             .collect();
+        println!("deps with target filtered out: {:#?}", deps);
 
         // This dependency is eliminated from the dependency tree under
         // the current target and feature set.
+        // Note to self dep_id is package_id
         if deps.is_empty() {
+            println!("deps is empty on dep_id {:?} of {:?}", dep_id, package_id);
             continue;
         }
 

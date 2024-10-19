@@ -143,11 +143,31 @@ pub fn build_and_print(ws: &Workspace<'_>, opts: &TreeOptions) -> CargoResult<()
         dry_run,
     )?;
 
+    // println!("{:#?}", ws_resolve.pkg_set.packages().map(|pkg| pkg.package_id()).collect::<Vec<_>>());
+    // let thing = ws_resolve.pkg_set.packages().flat_map(|pkg| pkg.)
+
     let package_map: HashMap<PackageId, &Package> = ws_resolve
         .pkg_set
         .packages()
         .map(|pkg| (pkg.package_id(), pkg)) // TODO here???
         .collect();
+    // the package_map is 3 things: foo, bar, and "None", meaning the baz cell has not been initialized
+    // println!("Resolver pkg_set {:#?}", ws_resolve.pkg_set.packages_debug().collect::<Vec<_>>());
+
+      // let package_map2: HashMap<PackageId, &Package> = ws_resolve
+      // .pkg_set
+      // .packages()
+      // .flat_map(|pkg| (
+      //   [(pkg.package_id(), pkg)].iter().chain(
+      //     pkg.dependencies().iter().map(|dep| ((dep.package_name(), dep.version_req(), dep.source_id()), dep))
+      //   )
+      // )
+      // ) // TODO here???
+      // .collect();
+
+    // pkg.dependencies().into_iter().map(|dep| ((dep.package_name(), dep.version_req(), dep.source_id()), dep))
+    // somehow artifact dep deps aren't showing up in this package_map
+    // either change this mapping above or stop conflating package and dependency
 
     let mut graph = graph::build(
         ws,
