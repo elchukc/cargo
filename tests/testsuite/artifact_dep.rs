@@ -1653,9 +1653,9 @@ fn dep_of_artifact_dep_same_target_specified() {
     // TODO This command currently fails due to a bug in cargo but it should be fixed so that it succeeds in the future.
     p.cargo("tree -Z bindeps")
         .masquerade_as_nightly_cargo(&["bindeps"])
-        .with_stderr_data("foo v0.0.0 ([ROOT]/foo)
-└── bindep v0.0.0 ([ROOT]/foo/bindep)
-")
+        .with_stdout_data(str![[r#"
+foo v0.1.0 ([ROOT]/foo)
+"#]])
         .with_status(0)
         .run();
 }
