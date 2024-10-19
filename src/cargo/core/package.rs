@@ -408,7 +408,7 @@ impl<'gctx> PackageSet<'gctx> {
 
         // let's not flood crates.io with connections
         multi.set_max_host_connections(2)?;
-        println!("LazyCell called on this from PackageSet: {:?}", package_ids);
+        // println!("LazyCell called on this from PackageSet: {:?}", package_ids);
 
         Ok(PackageSet {
             packages: package_ids

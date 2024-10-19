@@ -337,6 +337,7 @@ fn add_pkg(
         return *idx;
     }
     let from_index = graph.add_node(node);
+    println!("\nPackage: {}, node_kind: {:?}", package_id.name(), node_kind);
     // Compute the dep name map which is later used for foo/bar feature lookups.
     let mut dep_name_map: HashMap<InternedString, HashSet<(usize, bool)>> = HashMap::new();
     let mut deps: Vec<_> = resolve.deps(package_id).collect();
@@ -355,10 +356,13 @@ fn add_pkg(
                     (_, DepKind::Development) => node_kind,
                 };
                 // Filter out inactivated targets.
+                // TODO this should filter out artifact_deps too
+                println!("~{:?}      kind: {:?}       dep.kind(): {:?}       artifact: {:?}", dep.package_name(), kind, dep.kind(), dep.artifact());
                 if !show_all_targets && !target_data.dep_platform_activated(dep, kind) {
                     println!("Target is not activated, {:?}", kind);
                     return false;
                 }
+                println!("Show all targets was {show_all_targets} but target was {:?}", dep.platform());
                 // Filter out dev-dependencies if requested.
                 if !opts.edge_kinds.contains(&EdgeKind::Dep(dep.kind())) {
                     return false;
@@ -381,17 +385,19 @@ fn add_pkg(
                 true
             })
             .collect();
-        println!("deps with target filtered out: {:#?}", deps);
+        // println!("deps with target filtered out: {:#?}", deps);
 
         // This dependency is eliminated from the dependency tree under
         // the current target and feature set.
         // Note to self dep_id is package_id
+        // AHA! this is supposed to be empty because artifact dep is supposed to have been filtered out
         if deps.is_empty() {
             println!("deps is empty on dep_id {:?} of {:?}", dep_id, package_id);
             continue;
         }
 
         deps.sort_unstable_by_key(|dep| dep.name_in_toml());
+        // println!("Deps is not empty {:?}\n", deps);
         let dep_pkg = graph.package_map[&dep_id];
 
         for dep in deps {
