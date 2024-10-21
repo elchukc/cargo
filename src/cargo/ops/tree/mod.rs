@@ -151,6 +151,7 @@ pub fn build_and_print(ws: &Workspace<'_>, opts: &TreeOptions) -> CargoResult<()
         .packages()
         .map(|pkg| (pkg.package_id(), pkg)) // TODO here???
         .collect();
+    println!("PACKAGE SET {:#?}", ws_resolve.pkg_set.packages_debug().collect::<Vec<_>>());
     // the package_map is 3 things: foo, bar, and "None", meaning the baz cell has not been initialized
     // println!("Resolver pkg_set {:#?}", ws_resolve.pkg_set.packages_debug().collect::<Vec<_>>());
 

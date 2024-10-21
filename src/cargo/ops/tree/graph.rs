@@ -349,6 +349,7 @@ fn add_pkg(
             // This filter is *similar* to the one found in `unit_dependencies::compute_deps`.
             // Try to keep them in sync!
             .filter(|dep| {
+                // TODO change RIGHT HERE kind
                 let kind = match (node_kind, dep.kind()) {
                     (CompileKind::Host, _) => CompileKind::Host,
                     (_, DepKind::Build) => CompileKind::Host,
