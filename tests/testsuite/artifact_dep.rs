@@ -1655,6 +1655,9 @@ fn dep_of_artifact_dep_same_target_specified() {
         .masquerade_as_nightly_cargo(&["bindeps"])
         .with_stdout_data(str![[r#"
 foo v0.1.0 ([ROOT]/foo)
+└── bar v0.1.0 ([ROOT]/foo/bar)
+    └── baz v0.1.0 ([ROOT]/foo/baz)
+
 "#]])
         .with_status(0)
         .run();

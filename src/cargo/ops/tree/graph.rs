@@ -357,12 +357,11 @@ fn add_pkg(
                 };
                 // Filter out inactivated targets.
                 // TODO this should filter out artifact_deps too
-                println!("~{:?}      kind: {:?}       dep.kind(): {:?}       artifact: {:?}", dep.package_name(), kind, dep.kind(), dep.artifact());
+                println!("~{:?}      kind: {:?}       dep.kind(): {:?}      Platform: {:?}", dep.package_name(), kind, dep.kind(), dep.platform());
                 if !show_all_targets && !target_data.dep_platform_activated(dep, kind) {
                     println!("Target is not activated, {:?}", kind);
                     return false;
                 }
-                println!("Show all targets was {show_all_targets} but target was {:?}", dep.platform());
                 // Filter out dev-dependencies if requested.
                 if !opts.edge_kinds.contains(&EdgeKind::Dep(dep.kind())) {
                     return false;
@@ -398,6 +397,7 @@ fn add_pkg(
 
         deps.sort_unstable_by_key(|dep| dep.name_in_toml());
         // println!("Deps is not empty {:?}\n", deps);
+        // println!("PACKAGE MAP {:#?}", graph.package_map);
         let dep_pkg = graph.package_map[&dep_id];
 
         for dep in deps {
