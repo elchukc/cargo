@@ -510,6 +510,10 @@ impl<'gctx> PackageSet<'gctx> {
             if !used.insert(pkg_id) {
                 return Ok(());
             }
+            // println!("pkg: {:?}", dep.);
+            // resolve.deps(pkg_id).filter(|(dep_id, deps)| 
+            //     deps.iter().filter(|dep| dep.kind())
+            // )
             let filtered_deps = PackageSet::filter_deps(
                 pkg_id,
                 resolve,
@@ -518,7 +522,9 @@ impl<'gctx> PackageSet<'gctx> {
                 target_data,
                 force_all_targets,
             );
-            for (pkg_id, _dep) in filtered_deps {
+            for (pkg_id, _deps) in filtered_deps {
+                println!("Filtered dep: {:?}", pkg_id.name());
+                let artifact_deps = _deps.iter().filter(|dep| dep.artifact().and_then(|artifact| artifact.target()).and_then(|target| target.to_resolved_compile_target(requested_kinds)).is_some());
                 collect_used_deps(
                     used,
                     resolve,
@@ -616,6 +622,7 @@ impl<'gctx> PackageSet<'gctx> {
         target_data: &'a RustcTargetData<'_>,
         force_all_targets: ForceAllTargets,
     ) -> impl Iterator<Item = (PackageId, &'a HashSet<Dependency>)> + 'a {
+        println!("Package: {}", pkg_id.name());
         resolve
             .deps(pkg_id)
             .filter(move |&(_id, deps)| {
