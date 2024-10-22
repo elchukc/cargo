@@ -534,11 +534,11 @@ impl<'gctx> PackageSet<'gctx> {
             );
             for (pkg_id, deps) in filtered_deps {
                 println!("Filtered dep: {:?}", pkg_id.name());
-                let artifact_deps = deps.iter()
-                    .filter(|dep| dep.artifact()
-                    .and_then(|artifact| artifact.target())
-                    .and_then(|target| target.to_resolved_compile_target(*requested_kinds.iter().next().unwrap())).is_some());
-                println!("artifact_deps {:?}", artifact_deps.map(|adep| adep.package_name()).collect_vec());
+                let artifact_targets = deps.iter()
+                    .filter_map(|dep|
+                        dep.artifact()?.target()?.to_resolved_compile_target(*requested_kinds.iter().next().unwrap())
+                    );
+                println!("artifact_deps {:#?}", artifact_targets.collect_vec());
                 collect_used_deps(
                     used,
                     resolve,
