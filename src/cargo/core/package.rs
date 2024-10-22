@@ -13,6 +13,7 @@ use bytesize::ByteSize;
 use cargo_util_schemas::manifest::RustVersion;
 use curl::easy::Easy;
 use curl::multi::{EasyHandle, Multi};
+use itertools::Itertools;
 use lazycell::LazyCell;
 use semver::Version;
 use serde::Serialize;
@@ -534,17 +535,24 @@ impl<'gctx> PackageSet<'gctx> {
             );
             for (pkg_id, deps) in filtered_deps {
                 println!("Filtered dep: {:?}", pkg_id.name());
-                let artifact_targets = deps.iter()
+                // let artifact_targets = deps.iter()
+                //     .filter_map(|dep|
+                //         dep.artifact()?.target()?.to_resolved_compile_target(*requested_kinds.iter().next().unwrap())
+                //     );
+                // let collected = artifact_targets.collect_vec();
+
+                let artifact_kinds = deps.iter()
                     .filter_map(|dep|
-                        dep.artifact()?.target()?.to_resolved_compile_target(*requested_kinds.iter().next().unwrap())
+                        Some(dep.artifact()?.target()?.to_resolved_compile_kind(*requested_kinds.iter().next().unwrap()))
                     );
-                println!("artifact_deps {:#?}", artifact_targets.collect_vec());
+                let req_kinds = artifact_kinds.collect_vec();
+                // println!("artifact_deps {:#?}", artifact_targets.collect_vec());
                 collect_used_deps(
                     used,
                     resolve,
                     pkg_id,
                     has_dev_units,
-                    requested_kinds,
+                    &req_kinds,
                     target_data,
                     force_all_targets,
                 )?;
