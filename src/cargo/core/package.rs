@@ -511,20 +511,6 @@ impl<'gctx> PackageSet<'gctx> {
             if !used.insert(pkg_id) {
                 return Ok(());
             }
-            println!("Collecting used deps of Package: {}", pkg_id.name());
-            // println!("pkg: {:?}", dep.);
-            // resolve.deps(pkg_id).filter(|(dep_id, deps)| 
-            //     deps.iter().filter(|dep| dep.kind())
-            // )
-            // let artifact_deps = resolve.deps(pkg_id)
-                // .filter(|(dep_id, deps)| deps.artifact().and_then(|artifact| artifact.target())
-                // .and_then(|target| target.to_resolved_compile_target(*requested_kinds.iter().next().unwrap()))
-                // .is_some());
-
-            // println!("artifact_deps: {:#?}", artifact_deps.collect::<Vec<_>>());
-            // println!("artifact_deps {:?}", artifact_deps.map(|(pkg_id, _)| pkg_id.name()).collect_vec());
-            // let artifact_deps = _deps.iter().filter(|dep| dep.artifact().and_then(|artifact| artifact.target()).and_then(|target| target.to_resolved_compile_target(*requested_kinds.iter().next().unwrap())).is_some());
-            // println!("artifact_deps {:?}", artifact_deps.map(|adep| adep.package_name()).collect_vec());
             let filtered_deps = PackageSet::filter_deps(
                 pkg_id,
                 resolve,
@@ -534,19 +520,11 @@ impl<'gctx> PackageSet<'gctx> {
                 force_all_targets,
             );
             for (pkg_id, deps) in filtered_deps {
-                println!("Filtered dep: {:?}", pkg_id.name());
-                // let artifact_targets = deps.iter()
-                //     .filter_map(|dep|
-                //         dep.artifact()?.target()?.to_resolved_compile_target(*requested_kinds.iter().next().unwrap())
-                //     );
-                // let collected = artifact_targets.collect_vec();
-
                 let artifact_kinds = deps.iter()
                     .filter_map(|dep|
                         Some(dep.artifact()?.target()?.to_resolved_compile_kind(*requested_kinds.iter().next().unwrap()))
                     );
                 let req_kinds = artifact_kinds.collect_vec();
-                // println!("artifact_deps {:#?}", artifact_targets.collect_vec());
                 collect_used_deps(
                     used,
                     resolve,
@@ -644,7 +622,6 @@ impl<'gctx> PackageSet<'gctx> {
         target_data: &'a RustcTargetData<'_>,
         force_all_targets: ForceAllTargets,
     ) -> impl Iterator<Item = (PackageId, &'a HashSet<Dependency>)> + 'a {
-        // println!("Filter deps of Package: {}", pkg_id.name());
         resolve
             .deps(pkg_id)
             .filter(move |&(_id, deps)| {
