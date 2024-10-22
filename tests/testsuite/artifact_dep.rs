@@ -1779,7 +1779,6 @@ perhaps a crate was updated and forgotten to be re-vendored?
 
 // FIXME: `download_accessible` should work properly for artifact dependencies
 #[cargo_test]
-#[ignore = "broken, needs download_accessible fix"]
 fn proc_macro_in_artifact_dep() {
     // Forcing FeatureResolver to check a proc-macro for a dependency behind a
     // target dependency.
