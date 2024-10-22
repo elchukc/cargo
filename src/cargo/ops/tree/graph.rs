@@ -337,7 +337,7 @@ fn add_pkg(
         return *idx;
     }
     let from_index = graph.add_node(node);
-    println!("\nPackage: {}, node_kind: {:?}", package_id.name(), node_kind);
+    println!("\nPackage: {}, node_kind: {:?} requested_kind: {:?}", package_id.name(), node_kind, requested_kind);
     // Compute the dep name map which is later used for foo/bar feature lookups.
     let mut dep_name_map: HashMap<InternedString, HashSet<(usize, bool)>> = HashMap::new();
     let mut deps: Vec<_> = resolve.deps(package_id).collect();

@@ -501,6 +501,7 @@ impl<'gctx> PackageSet<'gctx> {
         target_data: &RustcTargetData<'gctx>,
         force_all_targets: ForceAllTargets,
     ) -> CargoResult<()> {
+        println!("In download_accessible: requested_kinds {:?}", requested_kinds);
         fn collect_used_deps(
             used: &mut BTreeSet<PackageId>,
             resolve: &Resolve,
@@ -551,6 +552,7 @@ impl<'gctx> PackageSet<'gctx> {
                 force_all_targets,
             )?;
         }
+        println!("to_download btree {:?}", to_download);
         self.get_many(to_download.into_iter())?;
         Ok(())
     }
@@ -619,21 +621,53 @@ impl<'gctx> PackageSet<'gctx> {
         target_data: &'a RustcTargetData<'_>,
         force_all_targets: ForceAllTargets,
     ) -> impl Iterator<Item = (PackageId, &'a HashSet<Dependency>)> + 'a {
+        println!("Filtering deps of {pkg_id:?}. Requested kinds: {:?}", requested_kinds);
         resolve
             .deps(pkg_id)
             .filter(move |&(_id, deps)| {
                 deps.iter().any(|dep| {
+                    println!("DEP: {:?}", dep.name_in_toml());
                     if dep.kind() == DepKind::Development && has_dev_units == HasDevUnits::No {
                         return false;
                     }
+                    println!("\tWAS NOT A DEV DEP");
                     if force_all_targets == ForceAllTargets::No {
+                        // let chain = match dep.artifact()
+                        //     .and_then(|artifact| artifact.target())
+                        //     .and_then(|target| target.to_resolved_compile_target(requested_kind)) {
+                        //         Some(target) => [&CompileKind::Target(target), &CompileKind::Host],
+                        //         None => &CompileKind::Host
+                        //     };
+                      //   let kind = match (node_kind, dep.kind()) {
+                      //     (CompileKind::Host, _) => CompileKind::Host,
+                      //     (_, DepKind::Build) => CompileKind::Host,
+                      //     (_, DepKind::Normal) => node_kind,
+                      //     (_, DepKind::Development) => node_kind,
+                      // };
+                        // let activated = if dep.artifact()
+                        //     .and_then(|artifact| artifact.target())
+                        //     .and_then(|target| target.to_resolved_compile_target(requested_kind))
+                        println!("REQUESTED KINDS {:?}", requested_kinds);
                         let activated = requested_kinds
                             .iter()
                             .chain(Some(&CompileKind::Host))
-                            .any(|kind| target_data.dep_platform_activated(dep, *kind));
+                            .chain(other)
+                            .any(|kind| {
+                              println!("REQUESTED KIND {:?}", kind);
+                              let req_kind = dep.artifact()
+                                  .and_then(|artifact| artifact.target())
+                                  .and_then(|target| target.to_resolved_compile_target(*kind))
+                                  .and_then(|ctarget| Some(CompileKind::Target(ctarget)))
+                                  .unwrap_or(*kind);
+
+                              println!("Artifact resolved compile target: {:?}", req_kind);
+                              target_data.dep_platform_activated(dep, req_kind)
+                        });
                         if !activated {
+                            println!("\tWAS NOT ACTIVATED");
                             return false;
                         }
+                        println!("\tWAS ACTIVATED");
                     }
                     true
                 })

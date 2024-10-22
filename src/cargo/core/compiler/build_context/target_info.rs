@@ -993,7 +993,8 @@ impl<'gctx> RustcTargetData<'gctx> {
             return true;
         };
         let name = self.short_name(&kind);
-        println!("Platform specified. {:?} - artifact: {:?} - kind: {:?} - Activated: {}", dep.name_in_toml(), dep.artifact(), kind, platform.matches(name, self.cfg(kind)));
+        println!("self.cfg(kind) {:#?}", self.cfg(kind));
+        println!("Platform specified. {:?} - artifact: {:?} - kind: {:?} - dep.kind(): {:?} - Activated: {}", dep.name_in_toml(), dep.artifact(), kind, dep.kind(), platform.matches(name, self.cfg(kind)));
         platform.matches(name, self.cfg(kind))
     }
 
