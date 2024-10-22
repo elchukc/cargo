@@ -624,14 +624,30 @@ impl<'gctx> PackageSet<'gctx> {
                         return false;
                     }
                     if force_all_targets == ForceAllTargets::No {
-                        let activated = requested_kinds
-                            .iter()
-                            .chain(Some(&CompileKind::Host))
-                            .any(|kind| target_data.dep_platform_activated(dep, *kind));
-                        if !activated {
-                            return false;
-                        }
+                        if let Some(req_kind) = dep.artifact()
+                                                                .and_then(|artifact| artifact.target())
+                                                                .and_then(|target| target.to_resolved_compile_target(*requested_kinds.iter().next().unwrap()))
+                                                                .and_then(|ctarget| Some(CompileKind::Target(ctarget)))
+                        {
+                            println!("dep {:?} - req_kind: {:?}", dep.name_in_toml(), req_kind);
+                            let activated = [req_kind]
+                                .iter()
+                                .chain(Some(&CompileKind::Host))
+                                .any(|kind| target_data.dep_platform_activated(dep, *kind));
+                            if !activated {
+                                return false;
+                            }
+                        } else {
+                            println!("dep {:?} - Host", dep.name_in_toml());
+                            let activated = requested_kinds
+                                .iter()
+                                .chain(Some(&CompileKind::Host))
+                                .any(|kind| target_data.dep_platform_activated(dep, *kind));
+                            if !activated {
+                                return false;
+                            }
                     }
+                  }
                     true
                 })
             })
