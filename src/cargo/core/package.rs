@@ -511,7 +511,6 @@ impl<'gctx> PackageSet<'gctx> {
             if !used.insert(pkg_id) {
                 return Ok(());
             }
-            println!("Collect used deps for pkg: {}   req_kinds {:?}", pkg_id.name(), requested_kinds);
             let filtered_deps = PackageSet::filter_deps(
                 pkg_id,
                 resolve,
@@ -525,8 +524,7 @@ impl<'gctx> PackageSet<'gctx> {
                     .filter_map(|dep|
                         Some(dep.artifact()?.target()?.to_resolved_compile_kind(*requested_kinds.iter().next().unwrap()))
                     );
-                let req_kinds = artifact_kinds.collect_vec();
-                println!("pkg_id: {pkg_id:?}     req_kinds: {:?}", req_kinds);
+                let req_kinds = [artifact_kinds.collect_vec().as_slice(), requested_kinds].concat();
                 collect_used_deps(
                     used,
                     resolve,
