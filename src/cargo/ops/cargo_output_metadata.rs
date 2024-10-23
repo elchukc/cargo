@@ -246,6 +246,7 @@ fn build_resolve_graph_r(
             let lib_target = targets.iter().find(|t| t.is_lib());
 
             for dep in deps.iter() {
+                // this filtering is VERY IMPORTANT
                 if let Some(target) = lib_target {
                     // When we do have a library target, include them in deps if...
                     let included = match dep.artifact() {
