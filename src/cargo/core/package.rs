@@ -527,11 +527,8 @@ impl<'gctx> PackageSet<'gctx> {
                             .to_resolved_compile_kind(*requested_kinds.iter().next().unwrap()),
                     )
                 });
-                let req_kinds = if !artifact_kinds.contains(&CompileKind::Host) {
-                    [artifact_kinds.collect_vec().as_slice(), requested_kinds].concat()
-                } else {
-                    requested_kinds
-                };
+                let req_kinds = [artifact_kinds.collect_vec().as_slice(), requested_kinds].concat();
+
                 collect_used_deps(
                     used,
                     resolve,
