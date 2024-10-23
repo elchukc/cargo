@@ -1777,7 +1777,6 @@ perhaps a crate was updated and forgotten to be re-vendored?
         .run();
 }
 
-// FIXME: `download_accessible` should work properly for artifact dependencies
 #[cargo_test]
 fn proc_macro_in_artifact_dep() {
     // Forcing FeatureResolver to check a proc-macro for a dependency behind a
@@ -1828,7 +1827,17 @@ fn proc_macro_in_artifact_dep() {
 
     p.cargo("check -Z bindeps")
         .masquerade_as_nightly_cargo(&["bindeps"])
-        .with_stderr_data(str![[r#""#]])
+        .with_stderr_data(str![[r#"
+[UPDATING] `dummy-registry` index
+[LOCKING] 2 packages to latest compatible versions
+[DOWNLOADING] crates ...
+[ERROR] failed to download from `[ROOTURL]/dl/pm/1.0.0/download`
+
+Caused by:
+  [37] Could not read a file:// file (Couldn't open file [ROOT]/dl/pm/1.0.0/download)
+
+"#]])
+        .with_status(101)
         .run();
 }
 
