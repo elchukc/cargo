@@ -520,11 +520,18 @@ impl<'gctx> PackageSet<'gctx> {
                 force_all_targets,
             );
             for (pkg_id, deps) in filtered_deps {
-                let artifact_kinds = deps.iter()
-                    .filter_map(|dep|
-                        Some(dep.artifact()?.target()?.to_resolved_compile_kind(*requested_kinds.iter().next().unwrap()))
-                    );
-                let req_kinds = [artifact_kinds.collect_vec().as_slice(), requested_kinds].concat();
+                let artifact_kinds = deps.iter().filter_map(|dep| {
+                    Some(
+                        dep.artifact()?
+                            .target()?
+                            .to_resolved_compile_kind(*requested_kinds.iter().next().unwrap()),
+                    )
+                });
+                let req_kinds = if !artifact_kinds.contains(&CompileKind::Host) {
+                    [artifact_kinds.collect_vec().as_slice(), requested_kinds].concat()
+                } else {
+                    requested_kinds
+                };
                 collect_used_deps(
                     used,
                     resolve,
