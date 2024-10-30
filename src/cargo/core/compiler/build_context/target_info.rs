@@ -987,10 +987,14 @@ impl<'gctx> RustcTargetData<'gctx> {
     pub fn dep_platform_activated(&self, dep: &Dependency, kind: CompileKind) -> bool {
         // If this dependency is only available for certain platforms,
         // make sure we're only enabling it for that platform.
+        // println!("Is platform activated? {:?}, artifact: {:?} Platform: {:?}", dep.name_in_toml(), dep.artifact(), dep.platform());
+        // println!("Is platform specified? {:?}. artifact: {:?} kind: {:?} Platform: {:?}", dep.name_in_toml(), dep.artifact(), kind, dep.platform());
         let Some(platform) = dep.platform() else {
             return true;
         };
         let name = self.short_name(&kind);
+        println!("self.cfg(kind) {:#?}", self.cfg(kind));
+        println!("Platform specified. {:?} - artifact: {:?} - kind: {:?} - dep.kind(): {:?} - Activated: {}", dep.name_in_toml(), dep.artifact(), kind, dep.kind(), platform.matches(name, self.cfg(kind)));
         platform.matches(name, self.cfg(kind))
     }
 

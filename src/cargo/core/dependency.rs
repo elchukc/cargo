@@ -242,6 +242,11 @@ impl Dependency {
         self.inner.name
     }
 
+    // // This probably won't work because the version requirement is prob different from the resolved version
+    // pub fn package_id(&self) -> PackageId {
+    //     PackageId::new(self.package_name(), self.version_req(), self.source_id())
+    // }
+
     pub fn source_id(&self) -> SourceId {
         self.inner.source_id
     }

@@ -337,6 +337,7 @@ fn add_pkg(
         return *idx;
     }
     let from_index = graph.add_node(node);
+    println!("\nPackage: {}, node_kind: {:?} requested_kind: {:?}", package_id.name(), node_kind, requested_kind);
     // Compute the dep name map which is later used for foo/bar feature lookups.
     let mut dep_name_map: HashMap<InternedString, HashSet<(usize, bool)>> = HashMap::new();
     let mut deps: Vec<_> = resolve.deps(package_id).collect();
@@ -348,6 +349,7 @@ fn add_pkg(
             // This filter is *similar* to the one found in `unit_dependencies::compute_deps`.
             // Try to keep them in sync!
             .filter(|dep| {
+                // TODO change RIGHT HERE kind
                 let kind = match (node_kind, dep.kind()) {
                     (CompileKind::Host, _) => CompileKind::Host,
                     (_, DepKind::Build) => CompileKind::Host,
@@ -355,7 +357,10 @@ fn add_pkg(
                     (_, DepKind::Development) => node_kind,
                 };
                 // Filter out inactivated targets.
+                // TODO this should filter out artifact_deps too
+                println!("~{:?}      kind: {:?}       dep.kind(): {:?}      Platform: {:?}", dep.package_name(), kind, dep.kind(), dep.platform());
                 if !show_all_targets && !target_data.dep_platform_activated(dep, kind) {
+                    println!("Target is not activated, {:?}", kind);
                     return false;
                 }
                 // Filter out dev-dependencies if requested.
@@ -380,14 +385,20 @@ fn add_pkg(
                 true
             })
             .collect();
+        // println!("deps with target filtered out: {:#?}", deps);
 
         // This dependency is eliminated from the dependency tree under
         // the current target and feature set.
+        // Note to self dep_id is package_id
+        // AHA! this is supposed to be empty because artifact dep is supposed to have been filtered out
         if deps.is_empty() {
+            println!("deps is empty on dep_id {:?} of {:?}", dep_id, package_id);
             continue;
         }
 
         deps.sort_unstable_by_key(|dep| dep.name_in_toml());
+        // println!("Deps is not empty {:?}\n", deps);
+        // println!("PACKAGE MAP {:#?}", graph.package_map);
         let dep_pkg = graph.package_map[&dep_id];
 
         for dep in deps {

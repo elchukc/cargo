@@ -223,6 +223,7 @@ pub fn resolve_ws_with_opts<'gctx>(
     };
 
     let pkg_set = get_resolved_packages(&resolved_with_overrides, registry)?;
+    // println!("pkg_set after get_resolved_packages: {:#?}", pkg_set.packages_debug().collect::<Vec<_>>());
 
     let member_ids = ws
         .members_with_features(specs, cli_features)?
@@ -237,6 +238,7 @@ pub fn resolve_ws_with_opts<'gctx>(
         target_data,
         force_all_targets,
     )?;
+    // println!("pkg_set after download_accessible: {:#?}", pkg_set.packages_debug().collect::<Vec<_>>());
 
     let feature_opts = FeatureOpts::new(ws, has_dev_units, force_all_targets)?;
     let resolved_features = FeatureResolver::resolve(
@@ -259,6 +261,7 @@ pub fn resolve_ws_with_opts<'gctx>(
         target_data,
         force_all_targets,
     )?;
+    // println!("pkg_set inside resolver: {:#?}", pkg_set.packages_debug().collect::<Vec<_>>());
 
     Ok(WorkspaceResolve {
         pkg_set,
