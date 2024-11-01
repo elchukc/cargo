@@ -1651,7 +1651,7 @@ fn dep_of_artifact_dep_same_target_specified() {
         .with_stdout_data(
             r#"...
 foo v0.1.0 ([ROOT]/foo)
-└── bar v0.1.0 ([ROOT]/foo/bar)
+└── bar v0.1.0 (bin) ([ROOT]/foo/bar)
     └── baz v0.1.0 ([ROOT]/foo/baz)
 "#,
         )
